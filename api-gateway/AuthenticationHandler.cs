@@ -19,7 +19,11 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
     protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
     {
         await Task.CompletedTask;
-        Context.Response.Redirect(Options.LoginPath.ToString());
+
+        if (!Context.Request.Path.StartsWithSegments(Options.ApiPath))
+            Context.Response.Redirect(Options.LoginPath.ToString());
+        else
+            Response.StatusCode = 401;
     }
 
     /// <summary>
@@ -30,7 +34,11 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
     protected override async Task HandleForbiddenAsync(AuthenticationProperties properties)
     {
         await Task.CompletedTask;
-        Context.Response.Redirect(Options.AccessDeniedPath.ToString());
+
+        if (!Context.Request.Path.StartsWithSegments(Options.ApiPath))
+            Context.Response.Redirect(Options.AccessDeniedPath.ToString());
+        else
+            Response.StatusCode = 403;
     }
 
     /// <summary>

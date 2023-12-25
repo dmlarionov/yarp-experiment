@@ -6,12 +6,17 @@ namespace ApiGateway;
 public class AuthenticationOptions : AuthenticationSchemeOptions
 {
     /// <summary>
-    /// Used inside HandleChallengeAsync to redirect the user to the login page.
+    /// The path to the APIs. A request to the API path isn't redirected to login / access denied page, it's shielded with 401 / 403 response.
+    /// </summary>
+    public PathString ApiPath { get; set; } = AuthenticationDefaults.ApiPath;
+
+    /// <summary>
+    /// The path to the login page.
     /// </summary>
     public PathString LoginPath { get; set; } = AuthenticationDefaults.LoginPath;
 
     /// <summary>
-    /// Used inside HandleForbidenAsync to redirect the user to the access denied page.
+    /// The path to the access denied page.
     /// </summary>
     public PathString AccessDeniedPath { get; set; } = AuthenticationDefaults.AccessDeniedPath;
 
