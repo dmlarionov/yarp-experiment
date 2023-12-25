@@ -1,9 +1,11 @@
 using ApiGateway;
 
 var builder = WebApplication.CreateBuilder(args);
-//builder.Services.AddReverseProxy()
-//  .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 builder.Services.AddAuthentication(AuthenticationDefaults.AuthenticationScheme)
     .AddXCookie(AuthenticationDefaults.AuthenticationScheme, options =>
@@ -11,6 +13,14 @@ builder.Services.AddAuthentication(AuthenticationDefaults.AuthenticationScheme)
         options.LoginPath = "/auth/login";
         options.AccessDeniedPath = "/auth/accessdenied";
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("authenticated", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+    });
+});
 
 var app = builder.Build();
 
@@ -23,12 +33,13 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapReverseProxy();
 
 app.MapControllerRoute(
     name: "default",
