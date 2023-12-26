@@ -1,11 +1,24 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using ApiGateway;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();   // console logging
 
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
+builder.Services.AddHttpClient("Auth-Service-Client", config =>
+{
+    var url = builder.Configuration.GetValue<string>("AuthorizationService.Address");
+    if (url == null)
+        throw new Exception("AuthorizationService.Address isn't configured! It must be HTTP(s) endpoint.");
+    config.BaseAddress = new Uri(url);
+});
 
 builder.Services.AddAuthentication(AuthenticationDefaults.AuthenticationScheme)
     .AddXCookie(AuthenticationDefaults.AuthenticationScheme, options =>
