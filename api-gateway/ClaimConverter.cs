@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using Microsoft.Extensions.Options;
 
 namespace ApiGateway
 {
