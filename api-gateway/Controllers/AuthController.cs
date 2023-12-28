@@ -49,7 +49,7 @@ namespace ApiGateway.Controllers
             _httpClientFactory = httpClientFactory;
             //_authServiceClient = httpClientFactory.CreateClient("Auth-Service-Client");
             _cookieProtector = dataProtectionProvider.CreateProtector(nameof(DistributedSessionGatewayMiddleware));
-            _headerProtector = dataProtectionProvider.CreateProtector(SessionDefaults.SessionHeaderProtectorPurpose);
+            _headerProtector = dataProtectionProvider.CreateProtector(nameof(DistributedSessionMiddleware));
             _logger = logger;
             _jsonSerializerOptions = new JsonSerializerOptions();
             _jsonSerializerOptions.Converters.Add(new ClaimConverter());

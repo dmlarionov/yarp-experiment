@@ -34,7 +34,7 @@ namespace Distributed.Session
 
             _next = next;
             _logger = loggerFactory.CreateLogger<DistributedSessionMiddleware>();
-            _headerProtector = dataProtectionProvider.CreateProtector(SessionDefaults.SessionHeaderProtectorPurpose);
+            _headerProtector = dataProtectionProvider.CreateProtector(nameof(DistributedSessionMiddleware));
             _options = options.Value;
             _sessionStore = sessionStore;   
         }

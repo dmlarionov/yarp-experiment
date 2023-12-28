@@ -10,7 +10,5 @@ namespace Distributed.Session
         /// The default propagation header name.
         /// </summary>
         public static readonly string PropagationHeaderName = "X-Session";
-
-        public static readonly string SessionHeaderProtectorPurpose = "Session Header";
     }
 }
