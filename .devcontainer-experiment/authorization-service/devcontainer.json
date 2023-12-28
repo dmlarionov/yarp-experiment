@@ -1,0 +1,10 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-docker-compose
+{
+	"name": "Authorizaton Service",
+	"dockerComposeFile": [
+		"../docker-compose.yml"
+	],
+	"service": "authorization-service",
+	"workspaceFolder": "/workspaces/authorization-service"
+}

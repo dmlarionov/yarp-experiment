@@ -1,0 +1,64 @@
+version: '3.7'
+
+services:
+  redis_commander:
+    depends_on:
+      - redis
+    image: rediscommander/redis-commander
+    restart: always
+    environment:
+      - REDIS_HOST=redis
+    ports:
+      - "8081:8081"
+  redis:
+    ports:
+      - "6379:6379"
+    image: redis:7.2.3
+
+  # api-gateway:
+  #   image: ${DOCKER_REGISTRY-}apigateway
+  #   build:
+  #     context: .
+  #     dockerfile: api-gateway/Dockerfile
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_URLS=https://+:443;http://+:80
+  #     - AUTHORIZATIONSERVICE_ADDRESS=https://authorization-service
+  #     - REVERSEPROXY_CLUSTERS_WEATHER_SERVICE_DESTINATIONS_MAIN_ADDRESS=https://weather-service
+  #   ports:
+  #     - "80"
+  #     - "443"
+  #   volumes:
+  #     - ~/.aspnet/https:/root/.aspnet/https:ro
+  #     - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+  
+  # authorization-service:
+  #   image: ${DOCKER_REGISTRY-}authorizationservice
+  #   build:
+  #     context: .
+  #     dockerfile: authorization-service/Dockerfile
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_URLS=https://+:443;http://+:80
+  #   ports:
+  #     - "80"
+  #     - "443"
+  #   volumes:
+  #     - ~/.aspnet/https:/root/.aspnet/https:ro
+  #     - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+  
+  # weather-service:
+  #   image: ${DOCKER_REGISTRY-}weatherservice
+  #   build:
+  #     context: .
+  #     dockerfile: weather-service/Dockerfile
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_URLS=https://+:443;http://+:80
+  #   ports:
+  #     - "80"
+  #     - "443"
+  #   volumes:
+  #     - ~/.aspnet/https:/root/.aspnet/https:ro
+  #     - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+      

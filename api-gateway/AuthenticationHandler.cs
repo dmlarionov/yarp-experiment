@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Text.Encodings.Web;
+using Distributed.Session;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
@@ -7,8 +8,33 @@ namespace ApiGateway;
 
 public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationOptions>
 {
-    public AuthenticationHandler(IOptionsMonitor<AuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder) : base(options, logger, encoder)
+    /// <summary>
+    /// The session key claim type in a principal.
+    /// </summary>
+    public static readonly string SessionKeyClaimType = "X-Session-Key";
+
+    public static readonly string IpAddressClaimType = "Ip-Address";
+
+    public static readonly string UserAgentClaimType = "User-Agent";
+
+    private readonly ISessionStore _sessionStore;
+    private readonly DistributedSessionOptions _sessionOptions;
+
+    public AuthenticationHandler(
+        IOptionsMonitor<AuthenticationOptions> options,
+        ISessionStore sessionStore,
+        IOptions<DistributedSessionOptions> sessionOptions,
+        ILoggerFactory logger,
+        UrlEncoder encoder) : base(options, logger, encoder)
     {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(sessionStore);
+        ArgumentNullException.ThrowIfNull(sessionOptions);
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(encoder);
+
+        _sessionStore = sessionStore;
+        _sessionOptions = sessionOptions.Value;
     }
 
     /// <summary>
@@ -42,7 +68,7 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
     }
 
     /// <summary>
-    /// Handles sign-in. Creates the cookie.
+    /// Handles sign-in. Creates the authorized session and cookie.
     /// </summary>
     /// <param name="user"></param>
     /// <param name="properties"></param>
@@ -51,24 +77,51 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
     {
         await Task.CompletedTask;
 
-        ClaimsIdentity claimsIdentity = (ClaimsIdentity)user.Identity!;
-        if (Options.CheckIpAddress && !user.HasClaim(claim => claim.Type == "IpAddress"))
+        // Check if previous session present and destroy it
+        if (Request.Cookies.ContainsKey(Options.CookieName))
         {
-            var ipAddress = Context.Connection.RemoteIpAddress!.ToString();
-            claimsIdentity.AddClaim(new Claim("IpAddress", ipAddress));
+            var previousCookieValue = Request.Cookies[Options.CookieName];
+            var previousTicket = Options.TicketDataFormat.Unprotect(previousCookieValue);
+
+            if (previousTicket != null)
+            {
+                var previousSessionKey = previousTicket.Principal.Claims
+                    .Where(x => x.Type == SessionKeyClaimType).FirstOrDefault()?.Value;
+                if (!string.IsNullOrEmpty(previousSessionKey))
+                    _sessionStore.Destroy(previousSessionKey);
+            }
         }
 
-        if (Options.CheckUserAgent && !user.HasClaim(claim => claim.Type == "UserAgent"))
+        // Create new session
+        var sessionKey = SessionKeyGenerator.GetSessionKey();
+        _sessionStore.Create(sessionKey, _sessionOptions.IdleTimeout, _sessionOptions.IOTimeout, true);
+
+        // Create new identity
+        ClaimsIdentity claimsIdentity = (ClaimsIdentity)user.Identity!;
+
+        // Add session key to identity
+        claimsIdentity.AddClaim(new Claim(SessionKeyClaimType, sessionKey));
+
+        // Add extra protection from session fixation attack
+        if (Options.CheckIpAddress && !user.HasClaim(claim => claim.Type == IpAddressClaimType))
+        {
+            var ipAddress = Context.Connection.RemoteIpAddress!.ToString();
+            claimsIdentity.AddClaim(new Claim(IpAddressClaimType, ipAddress));
+        }
+
+        if (Options.CheckUserAgent && !user.HasClaim(claim => claim.Type == UserAgentClaimType))
         {
             var userAgent = Context.Request.Headers["User-Agent"].ToString();
-            claimsIdentity.AddClaim(new Claim("UserAgent", userAgent));
+            claimsIdentity.AddClaim(new Claim(UserAgentClaimType, userAgent));
         }
 
         user.AddIdentity(claimsIdentity);
 
+        // Create new ticket
         var ticket = new AuthenticationTicket(user, AuthenticationDefaults.AuthenticationScheme);
         string cookieValue = Options.TicketDataFormat.Protect(ticket);
 
+        // Set cookie
         CookieOptions options = new()
         {
             HttpOnly = true,
@@ -99,7 +152,7 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
         if (Options.CheckUserAgent)
         {
             var userAgent = Request.Headers["User-Agent"].ToString();
-            var claim = ticket.Principal.Claims.Where(x => x.Type == "UserAgent").FirstOrDefault();
+            var claim = ticket.Principal.Claims.Where(x => x.Type == UserAgentClaimType).FirstOrDefault();
             if (claim == null || claim.Value != userAgent)
             {
                 return AuthenticateResult.Fail("Invalid user-agent");
@@ -109,7 +162,7 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
         if (Options.CheckIpAddress)
         {
             var ipAddress = Request.HttpContext.Connection.RemoteIpAddress!.ToString();
-            var claim = ticket.Principal.Claims.Where(x => x.Type == "IpAddress").FirstOrDefault();
+            var claim = ticket.Principal.Claims.Where(x => x.Type == IpAddressClaimType).FirstOrDefault();
             if (claim == null || claim.Value != ipAddress)
             {
                 return AuthenticateResult.Fail("Invalid ip-address");
@@ -128,6 +181,22 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
     {
         await Task.CompletedTask;
 
+        // Check if previous session present and destroy it
+        if (Request.Cookies.ContainsKey(Options.CookieName))
+        {
+            var cookieValue = Request.Cookies[Options.CookieName];
+            var ticket = Options.TicketDataFormat.Unprotect(cookieValue);
+
+            if (ticket != null)
+            {
+                var sessionKey = ticket.Principal.Claims
+                    .Where(x => x.Type == SessionKeyClaimType).FirstOrDefault()?.Value;
+                if (!string.IsNullOrEmpty(sessionKey))
+                    _sessionStore.Destroy(sessionKey);
+            }
+        }
+
+        // Delete cookie
         Response.Cookies.Delete(Options.CookieName);
     }
 }

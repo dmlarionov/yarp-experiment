@@ -1,0 +1,30 @@
+version: '3.4'
+
+services:
+  api-gateway:
+    image: mcr.microsoft.com/dotnet/sdk:8.0
+    volumes:
+      - ..:/workspaces:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    networks:
+      - mynet
+  
+  authorization-service:
+    image: mcr.microsoft.com/dotnet/sdk:8.0
+    volumes:
+      - ..:/workspaces:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    networks:
+      - mynet
+
+  weather-service:
+    image: mcr.microsoft.com/dotnet/sdk:8.0
+    volumes:
+      - ..:/workspaces:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    networks:
+      - mynet
+
+networks:
+  mynet:
+    driver: bridge

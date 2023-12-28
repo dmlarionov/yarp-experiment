@@ -3,11 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "api-gateway", "api-gateway\api-gateway.csproj", "{F303DBC1-4A16-4720-AAA8-B54067E70BF2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiGateway", "api-gateway\ApiGateway.csproj", "{F303DBC1-4A16-4720-AAA8-B54067E70BF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "weather-service", "weather-service\weather-service.csproj", "{221EA897-7F9D-44D8-BB80-EE558E7F99FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherService", "weather-service\WeatherService.csproj", "{221EA897-7F9D-44D8-BB80-EE558E7F99FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "authorization-service", "authorization-service\authorization-service.csproj", "{7BAFA8E3-7363-4B80-B38F-F6EB5044E3EF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthorizationService", "authorization-service\AuthorizationService.csproj", "{7BAFA8E3-7363-4B80-B38F-F6EB5044E3EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distributed.Session", "libraries\distributed-session\Distributed.Session.csproj", "{3F8E0488-49A8-4E76-ADA8-AF093B17C35E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{01898A15-9D74-4848-AFE5-CCC9A8E5E6C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,11 +31,22 @@ Global
 		{7BAFA8E3-7363-4B80-B38F-F6EB5044E3EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BAFA8E3-7363-4B80-B38F-F6EB5044E3EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BAFA8E3-7363-4B80-B38F-F6EB5044E3EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F8E0488-49A8-4E76-ADA8-AF093B17C35E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F8E0488-49A8-4E76-ADA8-AF093B17C35E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F8E0488-49A8-4E76-ADA8-AF093B17C35E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F8E0488-49A8-4E76-ADA8-AF093B17C35E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9279AC6-B875-41BC-882C-14C499D5D5C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9279AC6-B875-41BC-882C-14C499D5D5C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9279AC6-B875-41BC-882C-14C499D5D5C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9279AC6-B875-41BC-882C-14C499D5D5C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {40570015-39F5-429D-9B07-42AA772ED348}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3F8E0488-49A8-4E76-ADA8-AF093B17C35E} = {01898A15-9D74-4848-AFE5-CCC9A8E5E6C3}
 	EndGlobalSection
 EndGlobal

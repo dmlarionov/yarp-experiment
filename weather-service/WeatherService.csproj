@@ -4,21 +4,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>ApiGateway</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <RootNamespace>weather_service</RootNamespace>
+    <UserSecretsId>aaad0eb7-7006-4e7b-bab0-401bd847a429</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
   <ItemGroup>
-    <PackageReference Include="Yarp.ReverseProxy" Version="2.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Controllers\" />
-    <None Remove="Views\Demo\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Views\Demo\" />
-  </ItemGroup>
 </Project>
