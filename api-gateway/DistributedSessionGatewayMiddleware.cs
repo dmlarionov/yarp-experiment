@@ -51,7 +51,7 @@ namespace ApiGateway
                         context.Response.Cookies.Delete(UnauthorizedSessionCookieName);
                     }
 
-                    // THE PROPAGATION BELOW DOESN'T WORK (at least for authorization service called via HttpClient)
+                    // THE PROPAGATION BELOW DOESN'T WORK (please, configure HttpClient instead)
                     //// propagate authorized session in header
                     //var headerValue = SessionProtection.Protect(_headerProtector, authorizedSessionKey);
                     //// You must use the same header name you've used in distributed session options..
@@ -78,7 +78,7 @@ namespace ApiGateway
                     context.Response.Cookies.Append(UnauthorizedSessionCookieName, cookieValue, options);
                 }
 
-                // THE PROPAGATION BELOW DOESN'T WORK (at least for authorization service called via HttpClient)
+                // THE PROPAGATION BELOW DOESN'T WORK (please, configure HttpClient instead)
                 //// propagate unauthorized session in header
                 //var headerValue = SessionProtection.Protect(_headerProtector, unauthorizedSessionKey);
                 //// You must use the same header name you've used in distributed session options..
