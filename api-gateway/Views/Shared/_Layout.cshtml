@@ -43,11 +43,17 @@
 
     <footer class="container-fluid ms-2 me-2 ms-sm-3 me-sm-3 pt-3 border-top footer text-muted">
         <div class="justify-content-center">
+            @{
+                var sessionKey = (Context.User.Identity!.IsAuthenticated) ?
+                    Context.User.Claims.Where(x => x.Type == AuthenticationHandler.SessionKeyClaimType).FirstOrDefault()?.Value :
+                    "Unauthorized Session";
+            }
             <p>Is logged-in: @Context.User.Identity!.IsAuthenticated</p>
             <p>Auth Type: @Context.User.Identity!.AuthenticationType</p>
             <p>Name: @Context.User.Identity!.Name</p>
-            <p>Ip Address: @Context.User.Claims.Where(x => x.Type == "IpAddress").FirstOrDefault()?.Value</p>
-            <p>User Agent: @Context.User.Claims.Where(x => x.Type == "UserAgent").FirstOrDefault()?.Value</p>
+            <p>Ip Address: @Context.User.Claims.Where(x => x.Type == AuthenticationHandler.IpAddressClaimType).FirstOrDefault()?.Value</p>
+            <p>User Agent: @Context.User.Claims.Where(x => x.Type == AuthenticationHandler.UserAgentClaimType).FirstOrDefault()?.Value</p>
+            <p>Session Key: @sessionKey</p>
             @if (Context.User.Identity!.IsAuthenticated)
             {
                 <p><a asp-action="Logout" asp-controller="Auth">Logout</a></p>
