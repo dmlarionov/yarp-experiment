@@ -62,7 +62,7 @@ namespace ApiGateway
             // for non-authenticated user
             else
             {
-                // create unauthorized session only (if doesn't exists)
+                // create unauthorized session (if doesn't exists)
                 if (string.IsNullOrWhiteSpace(unauthorizedSessionKey))
                 {
                     // generate new session key
