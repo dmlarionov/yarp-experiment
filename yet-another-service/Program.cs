@@ -24,10 +24,7 @@ builder.Services.AddStackExchangeRedisCache(option =>
 });
 
 builder.Services.AddAuthentication()
-    .AddDistributedAuthentication(options =>
-    {
-        options.ApplicationName = "yarn-experiment";
-    });
+    .AddDistributedAuthentication();
 
 builder.Services.AddAuthorization(options =>
 {
