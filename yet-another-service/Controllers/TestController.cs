@@ -9,12 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace YetAnotherService.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     public class TestController : Controller
     {
         private const string RequestCountKey = "RequestCount";
 
-        // GET: /<controller>/
-        public IActionResult Index()
+        [HttpGet("/one")]
+        public IActionResult One()
         {
             return Json(new
             {
@@ -29,7 +31,8 @@ namespace YetAnotherService.Controllers
         }
 
         [Authorize]
-        public IActionResult Authorized()
+        [HttpGet("/two")]
+        public IActionResult Two()
         {
             return Json(new
             {
@@ -44,7 +47,8 @@ namespace YetAnotherService.Controllers
         }
 
         [Authorize(Roles = "power")]
-        public IActionResult Power1()
+        [HttpGet("/three")]
+        public IActionResult Three()
         {
             return Json(new
             {
@@ -59,7 +63,8 @@ namespace YetAnotherService.Controllers
         }
 
         [Authorize(Policy = "powerpolicy")]
-        public IActionResult Power2()
+        [HttpGet("/four")]
+        public IActionResult Four()
         {
             return Json(new
             {

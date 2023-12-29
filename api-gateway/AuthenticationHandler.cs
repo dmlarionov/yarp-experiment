@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace ApiGateway;
 
+// TODO: Identity duplication bug – check in HttpContext.User.Identities
 public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationOptions>
 {
     /// <summary>

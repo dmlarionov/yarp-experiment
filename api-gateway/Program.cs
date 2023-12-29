@@ -47,8 +47,9 @@ builder.Services.AddReverseProxy()
         var sessionCookieProtector = builderContext.Services.GetDataProtector(nameof(DistributedSessionGatewayMiddleware));
 
         // setup protection for authorization header
+        var ticketSerializer = new TicketSerializer();
         var ticketProtector = builderContext.Services.GetDataProtector("ticket");
-        var ticketDataFormat = new SecureDataFormat<AuthenticationTicket>(new TicketSerializer(), ticketProtector);
+        //var ticketDataFormat = new SecureDataFormat<AuthenticationTicket>(new TicketSerializer(), ticketProtector);
 
         // Added to all routes.
         builderContext.AddPathPrefix("/");
@@ -63,7 +64,8 @@ builder.Services.AddReverseProxy()
                     requestContext.HttpContext.User,
                     // Scheme name must match on gateway and microservice side!
                     Distributed.Authentication.AuthenticationDefaults.AuthenticationScheme);
-                var ticketValue = ticketDataFormat.Protect(ticket);
+                //var ticketValue = ticketDataFormat.Protect(ticket);
+                var ticketValue = TicketProtection.Protect(ticketProtector, ticketSerializer.Serialize(ticket));
                 requestContext.ProxyRequest.Headers.Add(HeaderNames.Authorization, "Bearer " + ticketValue);
 
                 // propagate authorized session in X-Session header

@@ -21,13 +21,25 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Demo" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Demo" asp-action="Page1">Page 1 (Unprotected)</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Demo" asp-action="Page1">Gw Page 1 (unprotected)</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Demo" asp-action="Page2">Page 2 (Protected)</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Demo" asp-action="Page2">Gw Page 2 (protected)</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="/api/weather">Weather API (Protected)</a>
+                            <a class="nav-link text-dark" href="/api/weather">Weather (API method protected on edge)</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/api/yet/one">Yet 1 (API method unprotected)</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/api/yet/two">Yet 2 (API method protected on service-level)</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/api/yet/three">Yet 3 (API method only for 'power' role)</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/api/yet/four">Yet 4 (API method only for 'power' role)</a>
                         </li>
                     </ul>
                 </div>

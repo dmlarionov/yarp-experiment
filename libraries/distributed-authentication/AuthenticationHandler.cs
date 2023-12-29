@@ -6,25 +6,23 @@ using Microsoft.Net.Http.Headers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Distributed.Authentication
 {
     public class AuthenticationHandler : AuthenticationHandler<AuthenticationOptions>
     {
-        private readonly ISecureDataFormat<AuthenticationTicket> _ticketDataFormat;
+        private readonly TicketSerializer _ticketSerializer = new TicketSerializer();
+        private readonly IDataProtector _protector;
 
         public AuthenticationHandler(
-            //IDataProtector dataProtector,
+            IDataProtectionProvider dataProtectionProvider,
             IOptionsMonitor<AuthenticationOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
             ISystemClock clock) : base(options, logger, encoder, clock)
         {
-            //var protector = DataProtectionProvider.Create(Options.ApplicationName).CreateProtector("ticket");
-            //var protector = dataProtector.CreateProtector("ticket");
-            // TODO: Remove hard-coded "yarn-experiment" as application name.
-            var protector = DataProtectionProvider.Create("yarn-experiment").CreateProtector("ticket");
-            _ticketDataFormat = new SecureDataFormat<AuthenticationTicket>(new TicketSerializer(), protector);
+            _protector = dataProtectionProvider.CreateProtector("ticket");
         }
 
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
@@ -54,7 +52,7 @@ namespace Distributed.Authentication
                 var token = authorization.Substring("Bearer ".Length).Trim();
                 if (!string.IsNullOrEmpty(token))
                 {
-                    var ticket = _ticketDataFormat.Unprotect(token);
+                    var ticket = _ticketSerializer.Deserialize(TicketProtection.Unprotect(_protector, token));
 
                     if (ticket == null)
                     {

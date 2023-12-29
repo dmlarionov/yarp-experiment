@@ -1,4 +1,5 @@
 ﻿using Distributed.Authentication;
+using Distributed.Session;
 using Microsoft.AspNetCore.DataProtection;
 using StackExchange.Redis;
 
@@ -37,6 +38,9 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
+// Add distributed session services
+builder.Services.AddDistributedSession();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -54,6 +58,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+// Use distributed session middleware
+app.UseDistributedSession();
 
 app.MapControllers();
 

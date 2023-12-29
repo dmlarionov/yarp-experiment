@@ -26,5 +26,8 @@
     <ProjectReference Include="..\libraries\distributed-authentication\Distributed.Authentication.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
+    <ProjectReference Include="..\libraries\distributed-session\Distributed.Session.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
   </ItemGroup>
 </Project>
