@@ -8,7 +8,7 @@ namespace ApiGateway
         public static readonly string UnauthorizedSessionCookieName = "X-Unauthorized-Session";
 
         private readonly RequestDelegate _next;
-        private readonly IDataProtector _headerProtector;
+        //private readonly IDataProtector _headerProtector;
         private readonly IDataProtector _cookieProtector;
         private readonly ISessionStore _sessionStore;
         private readonly ILogger _logger;
@@ -28,7 +28,7 @@ namespace ApiGateway
             _logger = loggerFactory.CreateLogger<DistributedSessionMiddleware>();
             // The protector purpose different for cookie and header propagation
             _cookieProtector = dataProtectionProvider.CreateProtector(nameof(DistributedSessionGatewayMiddleware));
-            _headerProtector = dataProtectionProvider.CreateProtector(nameof(DistributedSessionMiddleware));
+            //_headerProtector = dataProtectionProvider.CreateProtector(nameof(DistributedSessionMiddleware));
             _sessionStore = sessionStore;
         }
 

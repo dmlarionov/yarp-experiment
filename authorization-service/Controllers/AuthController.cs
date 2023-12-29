@@ -8,7 +8,7 @@ namespace AuthorizationService.Controllers;
 [Route("[controller]")]
 public class AuthController : ControllerBase
 {
-    private const string LoginAttemptCount = "LoginAttemptCount";
+    private const string LoginAttemptCountKey = "LoginAttemptCount";
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(ILogger<AuthController> logger)
@@ -21,8 +21,8 @@ public class AuthController : ControllerBase
     {
         await Task.CompletedTask;
 
-        var loginAttemptCount = (HttpContext.Session.GetInt32(LoginAttemptCount) ?? 0) + 1;
-        HttpContext.Session.SetInt32(LoginAttemptCount, loginAttemptCount);
+        var loginAttemptCount = (HttpContext.Session.GetInt32(LoginAttemptCountKey) ?? 0) + 1;
+        HttpContext.Session.SetInt32(LoginAttemptCountKey, loginAttemptCount);
         // tried too much!
         if (loginAttemptCount > 3)
         {
@@ -31,10 +31,19 @@ public class AuthController : ControllerBase
         // successful attempt
         else if (model.Username == "John" && model.Password == "pwd")
         {
-            HttpContext.Session.SetInt32(LoginAttemptCount, 0);
+            HttpContext.Session.SetInt32(LoginAttemptCountKey, 0);
             return new JsonResult(new LoginResult("Success", new List<Claim>
             {
                 new Claim(ClaimTypes.Name, model.Username)
+            }));
+        }
+        else if (model.Username == "Bob" && model.Password == "power")
+        {
+            HttpContext.Session.SetInt32(LoginAttemptCountKey, 0);
+            return new JsonResult(new LoginResult("Success", new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, model.Username),
+                new Claim(ClaimTypes.Role, "power")
             }));
         }
         // unsuccessful attempt

@@ -139,6 +139,7 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         await Task.CompletedTask;
+
         if (!Request.Cookies.ContainsKey(Options.CookieName)) return AuthenticateResult.NoResult();
 
         var cookieValue = Request.Cookies[Options.CookieName];

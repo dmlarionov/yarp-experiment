@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.DataProtection;
 using StackExchange.Redis;
 using Distributed.Session;
+using Distributed.Authentication;
 using ApiGateway;
 using Yarp.ReverseProxy.Transforms;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,41 +42,56 @@ builder.Services.AddReverseProxy()
     // Add transform to propagate session header for all the routes
     .AddTransforms(builderContext =>
     {
-        var headerProtector = builderContext.Services.GetDataProtector(nameof(DistributedSessionMiddleware));
-        var cookieProtector = builderContext.Services.GetDataProtector(nameof(DistributedSessionGatewayMiddleware));
+        // setup protection for session header / cookie
+        var sessionHeaderProtector = builderContext.Services.GetDataProtector(nameof(DistributedSessionMiddleware));
+        var sessionCookieProtector = builderContext.Services.GetDataProtector(nameof(DistributedSessionGatewayMiddleware));
+
+        // setup protection for authorization header
+        var ticketProtector = builderContext.Services.GetDataProtector("ticket");
+        var ticketDataFormat = new SecureDataFormat<AuthenticationTicket>(new TicketSerializer(), ticketProtector);
 
         // Added to all routes.
         builderContext.AddPathPrefix("/");
 
         builderContext.AddRequestTransform(requestContext =>
         {
-            // for authorized session (authenticated user) propagate from claim
+            // for authorized session (authenticated user)
             if (requestContext.HttpContext.User.Identity?.IsAuthenticated ?? false)
             {
-                var sessionKey = requestContext.HttpContext.User.Claims.Where(x => x.Type == AuthenticationHandler.SessionKeyClaimType).FirstOrDefault()?.Value;
+                // propagate authorization in Authorize header
+                var ticket = new AuthenticationTicket(
+                    requestContext.HttpContext.User,
+                    // Scheme name must match on gateway and microservice side!
+                    Distributed.Authentication.AuthenticationDefaults.AuthenticationScheme);
+                var ticketValue = ticketDataFormat.Protect(ticket);
+                requestContext.ProxyRequest.Headers.Add(HeaderNames.Authorization, "Bearer " + ticketValue);
 
-                // if session key is present propagate it
+                // propagate authorized session in X-Session header
+                var sessionKey = requestContext.HttpContext.User.Claims.Where(x => x.Type == ApiGateway.AuthenticationHandler.SessionKeyClaimType).FirstOrDefault()?.Value;
+                                
                 if (!string.IsNullOrEmpty(sessionKey))
                 {
-                    var headerValue = SessionProtection.Protect(headerProtector, sessionKey);
-                    // You must use the same header name you've used in distributed session options..
-                    // take attention if you've configured options via builder.Services.AddDistributedSession(options => ...)
-                    requestContext.ProxyRequest.Headers.Add(SessionDefaults.PropagationHeaderName!, headerValue);
+                    var sessionHeaderValue = SessionProtection.Protect(sessionHeaderProtector, sessionKey);
+                    // Header name must match on gateway and microservice side!
+                    requestContext.ProxyRequest.Headers.Add(SessionDefaults.PropagationHeaderName!, sessionHeaderValue);
                 }
             }
-            // for unauthorized session propagate from cookie
+            // for unauthorized session (non-authenticated user)
             else
             {
+                // remove Authorize header to avoid passing it from client-side
+                requestContext.ProxyRequest.Headers.Remove(HeaderNames.Authorization);
+
+                // propagate unauthorized session from cookie in X-Session header
                 var cookieValue = requestContext.HttpContext.Request.Cookies[DistributedSessionGatewayMiddleware.UnauthorizedSessionCookieName];
                 if (!string.IsNullOrEmpty(cookieValue))
                 {
-                    var sessionKey = SessionProtection.Unprotect(cookieProtector, cookieValue);
+                    var sessionKey = SessionProtection.Unprotect(sessionCookieProtector, cookieValue);
                     if (!string.IsNullOrWhiteSpace(sessionKey))
                     {
-                        var headerValue = SessionProtection.Protect(headerProtector, sessionKey);
-                        // You must use the same header name you've used in distributed session options..
-                        // take attention if you've configured options via builder.Services.AddDistributedSession(options => ...)
-                        requestContext.ProxyRequest.Headers.Add(SessionDefaults.PropagationHeaderName!, headerValue);
+                        var sessionHeaderValue = SessionProtection.Protect(sessionHeaderProtector, sessionKey);
+                        // Header name must match on gateway and microservice side!
+                        requestContext.ProxyRequest.Headers.Add(SessionDefaults.PropagationHeaderName!, sessionHeaderValue);
                     }
                 }
             }
@@ -95,8 +113,8 @@ builder.Services.AddHttpClient("Auth-Service-Client", config =>
 
 // Configure authentication
 
-builder.Services.AddAuthentication(AuthenticationDefaults.AuthenticationScheme)
-    .AddXCookie(AuthenticationDefaults.AuthenticationScheme, options =>
+builder.Services.AddAuthentication(ApiGateway.AuthenticationDefaults.AuthenticationScheme)
+    .AddXCookie(ApiGateway.AuthenticationDefaults.AuthenticationScheme, options =>
     {
         options.LoginPath = "/auth/login";
         options.AccessDeniedPath = "/auth/accessdenied";
