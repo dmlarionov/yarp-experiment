@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace ApiGateway;
 
-// TODO: Identity duplication bug – check in HttpContext.User.Identities
 public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationOptions>
 {
     /// <summary>
@@ -115,8 +114,6 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
             var userAgent = Context.Request.Headers["User-Agent"].ToString();
             claimsIdentity.AddClaim(new Claim(UserAgentClaimType, userAgent));
         }
-
-        user.AddIdentity(claimsIdentity);
 
         // Create new ticket
         var ticket = new AuthenticationTicket(user, AuthenticationDefaults.AuthenticationScheme);
