@@ -120,7 +120,7 @@ namespace ApiGateway.Controllers
             // for authenticated user
             if (HttpContext.User.Identity?.IsAuthenticated ?? false)
             {
-                var authorizedSessionKey = HttpContext.User.Claims.Where(x => x.Type == AuthenticationHandler.SessionKeyClaimType).FirstOrDefault()?.Value;
+                var authorizedSessionKey = HttpContext.User.Claims.Where(x => x.Type == Distributed.Session.ClaimTypes.SessionKeyClaimType).FirstOrDefault()?.Value;
 
                 if (!string.IsNullOrWhiteSpace(authorizedSessionKey))
                 {

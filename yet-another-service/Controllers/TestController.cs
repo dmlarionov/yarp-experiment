@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Distributed.Permissions;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -52,7 +53,7 @@ namespace YetAnotherService.Controllers
         {
             return Json(new
             {
-                About = "This method is accessible only by 'power' role members. It is protected with [Authorize(Roles = \"power\")].",
+                About = "This method is accessible only by 'power' role members.",
                 RequestMadeBy = new
                 {
                     UserName = HttpContext.User.Identity?.Name ?? "Unknown",
@@ -62,20 +63,32 @@ namespace YetAnotherService.Controllers
             });
         }
 
-        [Authorize(Policy = "powerpolicy")]
+        [Authorize]
         [HttpGet("/four")]
         public IActionResult Four()
         {
-            return Json(new
-            {
-                About = "This method is accessible only by 'power' role members. It is protected with [Authorize(Policy = \"powerpolicy\")].",
-                RequestMadeBy = new
+            if (HttpContext.HasPermission("Alcohol.Drink"))
+                return Json(new
                 {
-                    UserName = HttpContext.User.Identity?.Name ?? "Unknown",
-                    IsInPowerRole = HttpContext.User.IsInRole("power")
-                },
-                RequestCount = RequestCount()
-            });
+                    About = "This code path is accessible only by those who has \"Alcohol.Drink\" permission. Congratulations!",
+                    RequestMadeBy = new
+                    {
+                        UserName = HttpContext.User.Identity?.Name ?? "Unknown",
+                        IsInPowerRole = HttpContext.User.IsInRole("power")
+                    },
+                    RequestCount = RequestCount()
+                });
+            else
+                return Json(new
+                {
+                    About = "You don't have \"Alcohol.Drink\" permission. Sorry.",
+                    RequestMadeBy = new
+                    {
+                        UserName = HttpContext.User.Identity?.Name ?? "Unknown",
+                        IsInPowerRole = HttpContext.User.IsInRole("power")
+                    },
+                    RequestCount = RequestCount()
+                });
         }
 
         private int RequestCount()

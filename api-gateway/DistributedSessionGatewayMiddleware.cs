@@ -40,7 +40,7 @@ namespace ApiGateway
             // for authenticated user
             if (context.User.Identity?.IsAuthenticated ?? false)
             {
-                var authorizedSessionKey = context.User.Claims.Where(x => x.Type == AuthenticationHandler.SessionKeyClaimType).FirstOrDefault()?.Value;
+                var authorizedSessionKey = context.User.Claims.Where(x => x.Type == ClaimTypes.SessionKeyClaimType).FirstOrDefault()?.Value;
 
                 if (!string.IsNullOrWhiteSpace(authorizedSessionKey))
                 {

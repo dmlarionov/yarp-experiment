@@ -27,5 +27,8 @@
     <ProjectReference Include="..\libraries\distributed-session\Distributed.Session.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
+    <ProjectReference Include="..\libraries\distributed-permissions\Distributed.Permissions.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
   </ItemGroup>
 </Project>

@@ -69,7 +69,7 @@ builder.Services.AddReverseProxy()
                 requestContext.ProxyRequest.Headers.Add(HeaderNames.Authorization, "Bearer " + ticketValue);
 
                 // propagate authorized session in X-Session header
-                var sessionKey = requestContext.HttpContext.User.Claims.Where(x => x.Type == ApiGateway.AuthenticationHandler.SessionKeyClaimType).FirstOrDefault()?.Value;
+                var sessionKey = requestContext.HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.SessionKeyClaimType).FirstOrDefault()?.Value;
                                 
                 if (!string.IsNullOrEmpty(sessionKey))
                 {

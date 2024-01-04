@@ -9,11 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 var redisConnection = builder.Configuration.GetValue<string>("REDIS") ?? "localhost:6379";
 var redis = ConnectionMultiplexer.Connect(redisConnection);
 
+// Add data protection with shared key on readis. Those keys are used to encrypt headers / cookies.
 builder.Services
     .AddDataProtection()
     .SetApplicationName("yarn-experiment")
     .PersistKeysToStackExchangeRedis(redis, "DataProtectionKeys");
 
+// Add Redis for distributed session store
 builder.Services.AddStackExchangeRedisCache(option =>
 {
     option.Configuration = redisConnection;

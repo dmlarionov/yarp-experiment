@@ -3,16 +3,13 @@ using System.Text.Encodings.Web;
 using Distributed.Session;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using ClaimTypes = Distributed.Session.ClaimTypes;
 
 namespace ApiGateway;
 
+// TODO: I suspect a bug – session store operations aren't commited
 public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationOptions>
 {
-    /// <summary>
-    /// The session key claim type in a principal.
-    /// </summary>
-    public static readonly string SessionKeyClaimType = "X-Session-Key";
-
     public static readonly string IpAddressClaimType = "Ip-Address";
 
     public static readonly string UserAgentClaimType = "User-Agent";
@@ -86,21 +83,25 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
             if (previousTicket != null)
             {
                 var previousSessionKey = previousTicket.Principal.Claims
-                    .Where(x => x.Type == SessionKeyClaimType).FirstOrDefault()?.Value;
+                    .Where(x => x.Type == ClaimTypes.SessionKeyClaimType).FirstOrDefault()?.Value;
                 if (!string.IsNullOrEmpty(previousSessionKey))
                     _sessionStore.Destroy(previousSessionKey);
             }
         }
 
-        // Create new session
-        var sessionKey = SessionKeyGenerator.GetSessionKey();
-        _sessionStore.Create(sessionKey, _sessionOptions.IdleTimeout, _sessionOptions.IOTimeout, true);
-
-        // Create new identity
+        // Take user identity
         ClaimsIdentity claimsIdentity = (ClaimsIdentity)user.Identity!;
 
-        // Add session key to identity
-        claimsIdentity.AddClaim(new Claim(SessionKeyClaimType, sessionKey));
+        // If no session exists
+        if (!user.HasClaim(claim => claim.Type == ClaimTypes.SessionKeyClaimType))
+        {
+            // Create a new session
+            var sessionKey = SessionKeyGenerator.GetSessionKey();
+            _sessionStore.Create(sessionKey, _sessionOptions.IdleTimeout, _sessionOptions.IOTimeout, true);
+
+            // Add session key to claims
+            claimsIdentity.AddClaim(new Claim(ClaimTypes.SessionKeyClaimType, sessionKey));
+        }
 
         // Add extra protection from session fixation attack
         if (Options.CheckIpAddress && !user.HasClaim(claim => claim.Type == IpAddressClaimType))
@@ -189,7 +190,7 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
             if (ticket != null)
             {
                 var sessionKey = ticket.Principal.Claims
-                    .Where(x => x.Type == SessionKeyClaimType).FirstOrDefault()?.Value;
+                    .Where(x => x.Type == ClaimTypes.SessionKeyClaimType).FirstOrDefault()?.Value;
                 if (!string.IsNullOrEmpty(sessionKey))
                     _sessionStore.Destroy(sessionKey);
             }
