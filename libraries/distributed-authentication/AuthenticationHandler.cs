@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
 
 namespace Distributed.Authentication
 {
@@ -27,14 +28,16 @@ namespace Distributed.Authentication
 
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {
-            await Task.CompletedTask;
             Response.StatusCode = 401;
+            Response.ContentType = "text/plain";
+            await Response.WriteAsync("Unauthorized (service level)");
         }
 
         protected override async Task HandleForbiddenAsync(AuthenticationProperties properties)
         {
-            await Task.CompletedTask;
             Response.StatusCode = 403;
+            Response.ContentType = "text/plain";
+            await Response.WriteAsync("Forbidden (service level)");
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
