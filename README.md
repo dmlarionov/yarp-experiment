@@ -13,11 +13,11 @@ The gateway & libraries together implement the following features:
 5. Authorization logic is decoupled from API gateway – it was taken out to the auth service.
 6. The session data is accessible from any microservice (for both authorized and unauthorized sessions).
 7. Support for all the standard [ASP.NET Core Authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/introduction) mechanincs in the distributed environment, including roles and policies.
-8. Extra capability to keep permissions in a session (outside of a ticket) to solve HTTP headers bloat problem.
+8. Extra capability to keep permissions in a session data (outside of a ticket) to solve HTTP headers bloat problem.
 
 # Microservices / gateway
 
-`ApiGateway` – the ASP.NET core gateway based on YARP. The responsibilities of this component are:
+[ApiGateway](./api-gateway) – the ASP.NET core gateway based on YARP. The responsibilities of this component are:
 
 - Routing.
 - Edge level authorization.
@@ -26,9 +26,9 @@ The gateway & libraries together implement the following features:
 
 Serving of the pages is extra capability of the `ApiGateway` implemented solely for demo purpose.
 
-`AuthorizationService` – the ASP.NET Core microservice responsible for authorization & establishing an authorized session on the backend.
+[AuthorizationService](./authorization-service) – the ASP.NET Core microservice responsible for authorization & establishing an authorized session on the backend.
 
-`WeatherService` & `YetAnotherService` – examples of application microservices.
+[WeatherService](./weather-service) & [YetAnotherService](./yet-another-service) – examples of application microservices.
 
 # Libraries
 
