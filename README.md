@@ -78,11 +78,11 @@ Then try Yet 2 method (`/api/yet/two`) – you'll get 401 from the service becau
 
 Finally, try to access Page 2 (`/demo/page2`) – you'll be redirected to login page (`/auth/login`) by the gateway authentication handler because it distinguishes between page paths and APIs. Check how it works in the [ApiGateway authentication handler](./api-gateway/AuthenticationHandler.cs).
 
-If you try to authorize using wrong username / password (check [AuthController of AuthorizationService](./authorization-service/Controllers/AuthController.cs)) you'll be warned about wrong password and after 3 attempts locked (until unauthorized session expiration).
+If you try to login using wrong username / password you'll be warned about wrong password and after 3 attempts locked (until unauthorized session expiration). Check [AuthController of AuthorizationService](./authorization-service/Controllers/AuthController.cs).
 
 ## John (basic user)
 
-Login (`/auth/login`) using username `John` and password `pwd`.
+Login using username `John` and password `pwd`.
 
 Open the Page 2 (`/demo/page2`) – you'll get successful (200) response.
 
@@ -96,12 +96,12 @@ Finally, check Yet 4 (`/api/yet/four`) – you'll see that you don't have "Alcoh
 
 ## Bob (power user)
 
-Logout (`/auth/logout`) and re-login (`/auth/login`) using username `Bob` and password `power`.
+Logout and re-login using username `Bob` and password `power`.
 
 Test all the same paths you checked under `John`, see the difference:
 
-- Request counter starts from 1 again since you authorized again.
-- Yet 3 (`/api/yet/three`) is accessible because Bob is a member of 'power' role.
+- Request counter starts from 1 since you are authorized again.
+- Yet 3 (`/api/yet/three`) is accessible because Bob is a member of the 'power' role.
 - Yet 4 (`/api/yet/four`) returns slightly different response since Bob has "Alcohol.Drink" permission.
 
 Check the [AuthController of AuthorizationService](./authorization-service/Controllers/AuthController.cs) to understand how the permissions are set.
