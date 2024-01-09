@@ -7,7 +7,6 @@ using ClaimTypes = Distributed.Session.ClaimTypes;
 
 namespace ApiGateway;
 
-// TODO: I suspect a bug – session store operations aren't commited
 public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationOptions>
 {
     public static readonly string IpAddressClaimType = "Ip-Address";
@@ -46,7 +45,11 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
         if (!Context.Request.Path.StartsWithSegments(Options.ApiPath))
             Context.Response.Redirect(Options.LoginPath.ToString());
         else
+        {
             Response.StatusCode = 401;
+            Response.ContentType = "text/plain";
+            await Response.WriteAsync("Unauthorized (edge level)");
+        }
     }
 
     /// <summary>
@@ -56,12 +59,14 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
     /// <returns></returns>
     protected override async Task HandleForbiddenAsync(AuthenticationProperties properties)
     {
-        await Task.CompletedTask;
-
         if (!Context.Request.Path.StartsWithSegments(Options.ApiPath))
             Context.Response.Redirect(Options.AccessDeniedPath.ToString());
         else
+        {
             Response.StatusCode = 403;
+            Response.ContentType = "text/plain";
+            await Response.WriteAsync("Forbidden (edge level)");
+        }
     }
 
     /// <summary>
@@ -84,6 +89,8 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
             {
                 var previousSessionKey = previousTicket.Principal.Claims
                     .Where(x => x.Type == ClaimTypes.SessionKeyClaimType).FirstOrDefault()?.Value;
+
+                // Here we ensure the previous session is terminated
                 if (!string.IsNullOrEmpty(previousSessionKey))
                     _sessionStore.Destroy(previousSessionKey);
             }
@@ -95,6 +102,9 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
         // If no session exists
         if (!user.HasClaim(claim => claim.Type == ClaimTypes.SessionKeyClaimType))
         {
+            // Here we ensure the session is created
+            // (usually this code path isn't executed since AuthorizationService does that)
+
             // Create a new session
             var sessionKey = SessionKeyGenerator.GetSessionKey();
             _sessionStore.Create(sessionKey, _sessionOptions.IdleTimeout, _sessionOptions.IOTimeout, true);
@@ -191,6 +201,8 @@ public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationO
             {
                 var sessionKey = ticket.Principal.Claims
                     .Where(x => x.Type == ClaimTypes.SessionKeyClaimType).FirstOrDefault()?.Value;
+
+                // Here we ensure the session is terminated
                 if (!string.IsNullOrEmpty(sessionKey))
                     _sessionStore.Destroy(sessionKey);
             }
