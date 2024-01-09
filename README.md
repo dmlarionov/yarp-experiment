@@ -32,7 +32,7 @@ Serving of the pages is extra capability of the `ApiGateway` implemented solely 
 
 # Libraries
 
-[Distributed.Session](./libraries/distributed-session) – the session library for microservices made by analogy of original [ASP.NET Core Session Middleware](https://github.com/dotnet/aspnetcore/tree/main/src/Middleware/Session/src), which supports distributed session over [IDistributedCache](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/distributed). The only difference is that our `Distributed.Session` doesn't maintain cookies since doing it is a gateway responsibility.
+[Distributed.Session](./libraries/distributed-session) – the session library for microservices made by analogy of original [ASP.NET Core Session Middleware](https://github.com/dotnet/aspnetcore/tree/main/src/Middleware/Session/src), which supports distributed session over [IDistributedCache](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/distributed). The only difference is that our `Distributed.Session` doesn't maintain cookies since doing this is a gateway responsibility.
 
 [Distributed.Authentication](./libraries/distributed-authentication) – the authentication library for microservices. To propagate identity of an authenticated user we pass serialized [AuthenticationTicket](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.authenticationticket) (ASP.NET Core thing) by [HTTP bearer auth-scheme](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization). The ticket is protected cryptographically, not being a JWT.
 
@@ -72,9 +72,9 @@ You'll get successful responses (200) in both cases.
 
 Each time you access Yet 1 (`/api/yet/one`) the request counter is incremented and returned in response. This demonstrates unauthorized session, check how it works in the [TestController of YetAnotherService](./yet-another-service/Controllers/TestController.cs).
 
-Next, try to access Weather API method (`/api/weather`) – you'll get 401 from the gateway since the path is protected by an authorization policy in the YARP configuration (`ReverseProxy` segment). Check the [appsettings.json of the ApiGateway](./api-gateway/appsettings.json).
+Next, try to access Weather API method (`/api/weather`) – you'll get 401 from the gateway since the `weather` route is protected by an authorization policy in the YARP configuration (`ReverseProxy` segment). Check the [appsettings.json of the ApiGateway](./api-gateway/appsettings.json).
 
-Then try Yet 2 method (`/api/yet/two`) – you'll get 401 from the service because the path isn't protected at the gateway level (unlike the previous one), but the controller method has `[Authorize]` attribute.
+Then try Yet 2 method (`/api/yet/two`) – you'll get 401 from the service because the `yet` route isn't protected at the gateway level (unlike the `weather`), but the controller method has `[Authorize]` attribute.
 
 Finally, try to access Page 2 (`/demo/page2`) – you'll be redirected to login page (`/auth/login`) by the gateway authentication handler because it distinguishes between page paths and APIs. Check how it works in the [ApiGateway authentication handler](./api-gateway/AuthenticationHandler.cs).
 
