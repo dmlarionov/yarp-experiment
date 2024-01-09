@@ -9,11 +9,11 @@ The gateway & libraries together implement the following features:
 1. External auth token / credentials are decoupled from internal auth ticket ([OWASP recommendation](https://cheatsheetseries.owasp.org/cheatsheets/Microservices_Security_Cheat_Sheet.html#recommendation-on-how-to-implement-identity-propagation)).
 2. Internal auth ticket is crypto-protected using [ASP.NET Core Data Protection](https://learn.microsoft.com/en-us/aspnet/core/security/data-protection/introduction). This doesn't follow [the OWASP pattern with STS](https://cheatsheetseries.owasp.org/cheatsheets/Microservices_Security_Cheat_Sheet.html#using-a-data-structures-signed-by-a-trusted-issuer), but looks convenient for .NET-only microservice application.
 3. All the cookies are crypto-protected using [ASP.NET Core Data Protection](https://learn.microsoft.com/en-us/aspnet/core/security/data-protection/introduction).
-4. Unauthorized and authorized sessions are managed according to [OWASP recommendations](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#renew-the-session-id-after-any-privilege-level-change).
-5. Authorization logic is decoupled from API gateway – it was taken out to the auth service, whilst session management is coordinated between the authorization service and API gateway.
+4. Unauthorized and authorized sessions are managed according to [OWASP recommendations](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html).
+5. Authorization logic is decoupled from API gateway – it was taken out to the auth service.
 6. The session data is accessible from any microservice (for both authorized and unauthorized sessions).
-7. Support for all the standard [ASP.NET Core Authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/introduction) mechanincs in the distributed environment, including roles and policies. Everything is based on [ClaimsPrincipal](https://learn.microsoft.com/en-us/dotnet/api/system.security.claims.claimsprincipal) and [Claim](https://learn.microsoft.com/en-us/dotnet/api/system.security.claims.claim).
-8. Extra capability to keep permissions in a session (outside of a ticket) to solve HTTP headers bloat problem. We cache permissions during authorization and check using `HttpContext` extensions.
+7. Support for all the standard [ASP.NET Core Authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/introduction) mechanincs in the distributed environment, including roles and policies.
+8. Extra capability to keep permissions in a session (outside of a ticket) to solve HTTP headers bloat problem.
 
 # Microservices / gateway
 
