@@ -32,11 +32,11 @@ Serving of the pages is extra capability of the `ApiGateway` implemented solely 
 
 # Libraries
 
-`Distributed.Session` – the session library for microservices made by analogy of original [ASP.NET Core session middleware](https://github.com/dotnet/aspnetcore/tree/main/src/Middleware/Session/src), which supports distributed session over [IDistributedCache](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/distributed). The only difference is that our `Distributed.Session` doesn't maintain cookies since it is a gateway responsibility.
+[Distributed.Session](./libraries/distributed-session) – the session library for microservices made by analogy of original [ASP.NET Core Session Middleware](https://github.com/dotnet/aspnetcore/tree/main/src/Middleware/Session/src), which supports distributed session over [IDistributedCache](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/distributed). The only difference is that our `Distributed.Session` doesn't maintain cookies since doing it is a gateway responsibility.
 
-`Distributed.Authentication` – the authentication library for microservices. To propagate identity of an authenticated user we pass serialized [AuthenticationTicket](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.authenticationticket) (ASP.NET Core thing) by [HTTP bearer auth-scheme](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization). The ticket is protected cryptographically, not being a JWT.
+[Distributed.Authentication](./libraries/distributed-authentication) – the authentication library for microservices. To propagate identity of an authenticated user we pass serialized [AuthenticationTicket](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.authenticationticket) (ASP.NET Core thing) by [HTTP bearer auth-scheme](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization). The ticket is protected cryptographically, not being a JWT.
 
-`Distributed.Permissions` – the library to pass permissions using a distributed session. The experimental thing, which can help solving the HTTP headers bloat problem.
+[Distributed.Permissions](./libraries/distributed-permissions) – the library to pass permissions using a distributed session. The experimental thing, which can help solving the HTTP headers bloat problem.
 
 # Quick start
 
